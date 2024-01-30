@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
 const Chat = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation()
 
   const startChatWithDriver = () => {
    
