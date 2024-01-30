@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "139450998993",
+    "project_id": "voyogervibes-6f05f",
+    "storage_bucket": "voyogervibes-6f05f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139450998993:android:a601b7899d0a419470e5f0",
+        "android_client_info": {
+          "package_name": "com.voyagervibes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmt3HxrdPFfEgLa0bVrs-eisoeWqwFLjw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
