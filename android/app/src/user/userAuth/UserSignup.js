@@ -56,7 +56,7 @@ const UserSignup = () => {
       </Button>
       <Text style={styles.loginText}>
         Already have an account?{' '}
-        <Text style={styles.loginLink} onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.loginLink} onPress={() => navigation.navigate('UserLogin')}>
           Login
         </Text>
       </Text>

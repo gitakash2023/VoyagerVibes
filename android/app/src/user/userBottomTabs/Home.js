@@ -1,12 +1,16 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import { Header } from '@react-navigation/stack'
-import HeaderInput from '../userHeader/HeaderInput'
+
 
 
 const Home = () => {
   return (
-    <HeaderInput/>
+<View>
+
+  <Text>
+    hiiiii dear kaise ho , tum kaha ho 
+  </Text>
+</View>
   )
 }
 
