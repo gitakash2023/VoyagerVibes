@@ -12,10 +12,10 @@ const Splash = () => {
       const user = auth().currentUser;
       if (user) {
         // If user is logged in, navigate to UserHome
-        navigation.navigate('UserHome');
+        navigation.navigate('HomeScreen');
       } else {
         // If user is not logged in, navigate to Signup
-        navigation.navigate('UserSignup');
+        navigation.navigate('SignupScreen');
       }
     };
 
@@ -30,7 +30,7 @@ const Splash = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={{ uri: 'https://pbs.twimg.com/media/DfQZTWbWsAAWQx9.jpg' }}
+        source={{ uri: 'https://herobot.app/wp-content/uploads/2022/11/11-Reasons-Why-A-Chat-Application-Is-Great-For-Business_1.jpg' }}
         style={styles.splashImage}
       />
     </View>
