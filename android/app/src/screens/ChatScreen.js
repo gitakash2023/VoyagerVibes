@@ -1,112 +1,81 @@
-import React,{useState,useEffect} from 'react'
-import { View, Text } from 'react-native'
-import { GiftedChat,Bubble,InputToolbar} from 'react-native-gifted-chat'
-import firestore from '@react-native-firebase/firestore'
-export default function ChatScreen({user,route}) {
-    const [messages, setMessages] = useState([]);
-     const {uid} = route.params;
-     const getAllMessages = async ()=>{
-        const docid  = uid > user.uid ? user.uid+ "-" + uid : uid+"-"+user.uid 
-        const querySanp = await firestore().collection('chatrooms')
-        .doc(docid)
+import React, { useState, useEffect } from 'react';
+import { View, Platform, KeyboardAvoidingView } from 'react-native';
+import { GiftedChat } from 'react-native-gifted-chat';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+
+const ChatScreen = ({ route }) => {
+  const [messages, setMessages] = useState([]);
+  const currentUser = auth().currentUser;
+  const { ownerId } = route.params; // Check if ownerId is correctly accessed from route.params
+  console.log('Owner ID:', ownerId); // Debugging to check if ownerId is correctly received
+
+  useEffect(() => {
+    console.log('Current User ID:', currentUser.uid);
+
+    // Ensure ownerId is not undefined before proceeding
+    if (ownerId) {
+      const chatId = [currentUser.uid, ownerId].sort().join('_');
+
+      const unsubscribe = firestore()
+        .collection('chats')
+        .doc(chatId)
         .collection('messages')
-        .orderBy('createdAt',"desc")
-        .get()
-       const allmsg =   querySanp.docs.map(docSanp=>{
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(querySnapshot => {
+          const messagesData = querySnapshot.docs.map(doc => {
+            const data = doc.data();
             return {
-                ...docSanp.data(),
-                createdAt:docSanp.data().createdAt.toDate()
-            }
-        })
-        setMessages(allmsg)
+              _id: doc.id,
+              text: data.text,
+              createdAt: data.timestamp ? data.timestamp.toDate() : new Date(),
+              user: {
+                _id: data.user._id,
+              },
+            };
+          });
+          console.log('Messages:', messagesData);
+          setMessages(messagesData);
+        });
 
-    
-     }
-    useEffect(() => {
-      // getAllMessages()
+      return () => unsubscribe();
+    }
+  }, [ownerId, currentUser]);
 
-      const docid  = uid > user.uid ? user.uid+ "-" + uid : uid+"-"+user.uid 
-        const messageRef = firestore().collection('chatrooms')
-        .doc(docid)
-        .collection('messages')
-        .orderBy('createdAt',"desc")
-
-      const unSubscribe =  messageRef.onSnapshot((querySnap)=>{
-            const allmsg =   querySnap.docs.map(docSanp=>{
-             const data = docSanp.data()
-             if(data.createdAt){
-                 return {
-                    ...docSanp.data(),
-                    createdAt:docSanp.data().createdAt.toDate()
-                }
-             }else {
-                return {
-                    ...docSanp.data(),
-                    createdAt:new Date()
-                }
-             }
-                
-            })
-            setMessages(allmsg)
-        })
-
-
-        return ()=>{
-          unSubscribe()
-        }
-
-        
-      }, [])
-
-      const onSend =(messageArray) => {
-        const msg = messageArray[0]
-        const mymsg = {
-            ...msg,
-            sentBy:user.uid,
-            sentTo:uid,
-            createdAt:new Date()
-        }
-       setMessages(previousMessages => GiftedChat.append(previousMessages,mymsg))
-       const docid  = uid > user.uid ? user.uid+ "-" + uid : uid+"-"+user.uid 
- 
-       firestore().collection('chatrooms')
-       .doc(docid)
-       .collection('messages')
-       .add({...mymsg,createdAt:firestore.FieldValue.serverTimestamp()})
-
-
+  const handleSendMessage = async (newMessages = []) => {
+    const newMessage = newMessages[0];
+    if (ownerId) {
+      const chatId = [currentUser.uid, ownerId].sort().join('_');
+      try {
+        await firestore()
+          .collection('chats')
+          .doc(chatId)
+          .collection('messages')
+          .add({
+            user: {
+              _id: currentUser.uid,
+            },
+            text: newMessage.text,
+            createdAt: firestore.FieldValue.serverTimestamp(),
+          });
+      } catch (error) {
+        console.error('Error sending message:', error);
       }
-    return (
-        <View style={{flex:1,backgroundColor:"#f5f5f5"}}>
-           <GiftedChat
-                messages={messages}
-                onSend={text => onSend(text)}
-                user={{
-                    _id: user.uid,
-                }}
-                renderBubble={(props)=>{
-                    return <Bubble
-                    {...props}
-                    wrapperStyle={{
-                      right: {
-                        backgroundColor:"green",
+    }
+  };
 
-                      }
-                      
-                    }}
-                  />
-                }}
+  return (
+    <View style={{ flex: 1 }}>
+      <GiftedChat
+        messages={messages}
+        onSend={newMessages => handleSendMessage(newMessages)}
+        user={{
+          _id: currentUser.uid,
+        }}
+      />
+      {Platform.OS === 'android' && <KeyboardAvoidingView behavior="padding" />}
+    </View>
+  );
+};
 
-                renderInputToolbar={(props)=>{
-                    return <InputToolbar {...props}
-                     containerStyle={{borderTopWidth: 1.5, borderTopColor: 'green'}} 
-                     textInputStyle={{ color: "black" }}
-                     />
-                }}
-                
-                />
-        </View>
-    )
-}
-
-
+export default ChatScreen;
