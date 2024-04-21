@@ -113,7 +113,7 @@ const UserSignup = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'pink',
+    backgroundColor: 'white',
     padding: 20,
   },
   text: {

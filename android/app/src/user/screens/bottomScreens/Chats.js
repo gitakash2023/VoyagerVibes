@@ -1,3 +1,4 @@
+// Chat.js
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, TouchableOpacity, Image, StyleSheet, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -6,23 +7,17 @@ import firestore from '@react-native-firebase/firestore';
 
 const Chat = () => {
   const [owners, setOwners] = useState([]);
-  const [uniqueOwnerNames, setUniqueOwnerNames] = useState([]);
   const navigation = useNavigation();
 
   useEffect(() => {
     const fetchOwners = async () => {
       try {
-        const currentUser = auth().currentUser;
-
-        if (currentUser) {
-          const ownersSnapshot = await firestore().collection('orders').where('currentUserId', '==', currentUser.uid).get();
-          const ownersData = ownersSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          setOwners(ownersData);
-        }
+        const ownersSnapshot = await firestore().collection('allUsers').where('role', '==', 'owner').get();
+        const ownersData = ownersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setOwners(ownersData);
       } catch (error) {
         console.error('Error fetching owners:', error);
       }
@@ -31,21 +26,17 @@ const Chat = () => {
     fetchOwners();
   }, []);
 
-  useEffect(() => {
-    const uniqueNames = Array.from(new Set(owners.map(owner => owner.owner)));
-    setUniqueOwnerNames(uniqueNames);
-  }, [owners]);
-
   const handleChat = (ownerId) => {
     navigation.navigate('ChatScreen', { ownerId });
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleChat(item.ownerId)}>
+    <TouchableOpacity onPress={() => handleChat(item.id)}>
       <View style={styles.itemContainer}>
-        <Image source={{ uri: 'https://png.pngtree.com/png-vector/20191009/ourmid/pngtree-user-icon-png-image_1796659.jpg' }} style={styles.image} />
+      <Image source={{ uri: 'https://png.pngtree.com/png-vector/20191009/ourmid/pngtree-user-icon-png-image_1796659.jpg' }} style={styles.image} />
         <View style={styles.userInfo}>
-          <Text style={styles.name}>{item}</Text>
+          <Text style={styles.name}>{item.name}</Text>
+         
         </View>
       </View>
     </TouchableOpacity>
@@ -53,9 +44,9 @@ const Chat = () => {
 
   return (
     <FlatList
-      data={uniqueOwnerNames}
+      data={owners}
       renderItem={renderItem}
-      keyExtractor={item => item}
+      keyExtractor={item => item.id} 
     />
   );
 };
@@ -81,6 +72,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: 'black',
+  },
+  ownerId: {
+    fontSize: 14,
+    color: 'gray',
   },
 });
 

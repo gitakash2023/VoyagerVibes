@@ -1,28 +1,15 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import {View, Text} from 'react-native';
+import React from 'react';
 
-import UserLogout from '../UserLogout'
-
-
-
-
-
-
-
-
-
-
+import UserLogout from '../UserLogout';
 
 const Account = () => {
   return (
     <View>
-  
-   <UserLogout/>
-  {/* <Profile/> */}
-   
-  
+      <UserLogout />
+      {/* <Profile/> */}
     </View>
-  )
-}
+  );
+};
 
-export default Account
+export default Account;
